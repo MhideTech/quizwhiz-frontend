@@ -1,7 +1,11 @@
-export interface CreateQuizFormData {
+export interface CreateQuizFormType {
   title: string;
   description: string;
-  tags: string[];
+  category: string;
+  isPublic: boolean;
+  timeLimit: string;
+  difficulty: string;
+  tags?: string[];
 }
 
 export interface CreateQuizModalProps {

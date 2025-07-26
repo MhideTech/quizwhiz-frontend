@@ -9,7 +9,7 @@ import { Badge } from '@/common/components/ui/badge';
 import { createQuiz } from '../api';
 import { useMutation } from '@tanstack/react-query';
 
-import { CreateQuizModalProps, CreateQuizFormData } from '../types';
+import { CreateQuizModalProps, CreateQuizFormType } from '../types';
 import { useAuth } from '@/features/auth/useAuth';
 import { toast } from 'sonner';
 
@@ -24,7 +24,7 @@ const CreateQuizModal = ({ isOpen, onClose }: CreateQuizModalProps) => {
     formState: { errors, isSubmitting },
     setValue,
     watch,
-  } = useForm<CreateQuizFormData>({
+  } = useForm<CreateQuizFormType>({
     defaultValues: {
       title: '',
       description: '',
@@ -57,7 +57,7 @@ const CreateQuizModal = ({ isOpen, onClose }: CreateQuizModalProps) => {
   };
 
   const mutation = useMutation({
-    mutationFn: (quizData: CreateQuizFormData) => createQuiz(quizData),
+    mutationFn: (quizData: CreateQuizFormType) => createQuiz(quizData),
     onSuccess: (data) => {
       reset();
       setTags([]);
@@ -71,7 +71,7 @@ const CreateQuizModal = ({ isOpen, onClose }: CreateQuizModalProps) => {
     },
   });
 
-  const onSubmit = async (data: CreateQuizFormData) => {
+  const onSubmit = async (data: CreateQuizFormType) => {
     mutation.mutate(data);
   };
 

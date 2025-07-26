@@ -15,21 +15,17 @@ import {
 import { Switch } from '@/common/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Save, Loader2 } from 'lucide-react';
-
-interface CreateQuizForm {
-  title: string;
-  description: string;
-  category: string;
-  isPublic: boolean;
-  timeLimit: string;
-  difficulty: string;
-}
+import { useForm } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
+import { createQuiz } from '../api';
+import { CreateQuizFormType } from '../types';
 
 const CreateQuiz = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { register, handleSubmit, reset } = useForm();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateQuizForm>({
+  const [formData, setFormData] = useState<CreateQuizFormType>({
     title: '',
     description: '',
     category: '',
@@ -64,17 +60,30 @@ const CreateQuiz = () => {
     { value: 'unlimited', label: 'No time limit' },
   ];
 
-  const handleInputChange = (field: keyof CreateQuizForm, value: string | boolean) => {
+  const handleInputChange = (field: keyof CreateQuizFormType, value: string | boolean) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const mutation = useMutation({
+    mutationFn: (quizData: CreateQuizFormType) => createQuiz(quizData),
+    onSuccess: (data) => {
+      reset();
 
-    if (!formData.title.trim()) {
+      // toast('Quiz created successfully');
+    },
+    onError: (error) => {
+      // toast('Error creating quiz');
+    },
+  });
+
+  const onSubmit = async (data: CreateQuizFormType) => {
+    alert('Hello');
+    mutation.mutate(data);
+
+    if (!data.title.trim()) {
       toast({
         title: 'Error',
         description: 'Quiz title is required',
@@ -83,7 +92,7 @@ const CreateQuiz = () => {
       return;
     }
 
-    if (!formData.category) {
+    if (!data.category) {
       toast({
         title: 'Error',
         description: 'Please select a category',
@@ -96,7 +105,7 @@ const CreateQuiz = () => {
 
     // Mock API call with loading simulation
     try {
-      console.log('Creating quiz with data:', formData);
+      console.log('Creating quiz with data:', data);
 
       // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -111,8 +120,10 @@ const CreateQuiz = () => {
 
       console.log('Quiz created with ID:', mockQuizId);
 
+      reset();
+
       // Navigate to add questions page
-      navigate(`/dashboard/quiz/${mockQuizId}/add-question`);
+      // navigate(`/dashboard/quiz/${mockQuizId}/add-question`);
     } catch (error) {
       console.error('Error creating quiz:', error);
       toast({
@@ -134,7 +145,7 @@ const CreateQuiz = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className='space-y-6'>
+      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
           {/* Main Form */}
           <div className='lg:col-span-2 space-y-6'>
@@ -151,10 +162,17 @@ const CreateQuiz = () => {
                   <Input
                     id='title'
                     placeholder='Enter an engaging quiz title...'
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    // value={formData.title}
+                    // onChange={(e) => handleInputChange('title', e.target.value)}
                     disabled={isLoading}
                     className='text-base'
+                    {...register('title', {
+                      required: 'Quiz title is required',
+                      minLength: {
+                        value: 3,
+                        message: 'Title must be at least 3 characters long',
+                      },
+                    })}
                   />
                 </div>
 
@@ -163,11 +181,18 @@ const CreateQuiz = () => {
                   <Textarea
                     id='description'
                     placeholder='Provide a brief description of your quiz...'
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    // value={formData.description}
+                    // onChange={(e) => handleInputChange('description', e.target.value)}
                     disabled={isLoading}
                     rows={3}
                     className='resize-none'
+                    {...register('description', {
+                      required: 'Description is required',
+                      minLength: {
+                        value: 10,
+                        message: 'Description must be at least 10 characters long',
+                      },
+                    })}
                   />
                 </div>
 
@@ -175,9 +200,12 @@ const CreateQuiz = () => {
                   <div className='space-y-2'>
                     <Label htmlFor='category'>Category *</Label>
                     <Select
-                      value={formData.category}
-                      onValueChange={(value) => handleInputChange('category', value)}
+                      // value={formData.category}
+                      // onValueChange={(value) => handleInputChange('category', value)}
                       disabled={isLoading}
+                      {...register('category', {
+                        required: 'Category is required',
+                      })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder='Select a category' />
@@ -195,9 +223,10 @@ const CreateQuiz = () => {
                   <div className='space-y-2'>
                     <Label htmlFor='difficulty'>Difficulty</Label>
                     <Select
-                      value={formData.difficulty}
-                      onValueChange={(value) => handleInputChange('difficulty', value)}
+                      // value={formData.difficulty}
+                      // onValueChange={(value) => handleInputChange('difficulty', value)}
                       disabled={isLoading}
+                      {...register('difficulty')}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -226,9 +255,12 @@ const CreateQuiz = () => {
                 <div className='space-y-2'>
                   <Label htmlFor='timeLimit'>Time Limit</Label>
                   <Select
-                    value={formData.timeLimit}
-                    onValueChange={(value) => handleInputChange('timeLimit', value)}
+                    // value={formData.timeLimit}
+                    // onValueChange={(value) => handleInputChange('timeLimit', value)}
                     disabled={isLoading}
+                    {...register('timeLimit', {
+                      required: 'Time Limit is required',
+                    })}
                   >
                     <SelectTrigger>
                       <SelectValue />

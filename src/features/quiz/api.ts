@@ -1,7 +1,7 @@
 import axiosInstance from '@/common/api/axiosInstance';
-import { CreateQuizFormData } from './types';
+import { CreateQuizFormType } from './types';
 
-export async function createQuiz(quizData: CreateQuizFormData) {
+export async function createQuiz(quizData: CreateQuizFormType) {
   const { data } = await axiosInstance.post('quiz', quizData);
   return data;
 }
