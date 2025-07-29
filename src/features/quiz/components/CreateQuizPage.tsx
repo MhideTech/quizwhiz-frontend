@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui/card';
 import { Button } from '@/common/components/ui/button';
 import { Input } from '@/common/components/ui/input';
 import { Label } from '@/common/components/ui/label';
 import { Textarea } from '@/common/components/ui/textarea';
+import Taginput from '@/common/components/custom/TagInput';
+import { toast } from 'sonner';
+
 import {
   Select,
   SelectContent,
@@ -15,126 +18,83 @@ import {
 import { Switch } from '@/common/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Save, Loader2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { InputType } from 'zlib';
 import { useMutation } from '@tanstack/react-query';
 import { createQuiz } from '../api';
 import { CreateQuizFormType } from '../types';
 
+const categories = [
+  'General Knowledge',
+  'Science',
+  'History',
+  'Sports',
+  'Technology',
+  'Arts & Literature',
+  'Geography',
+  'Entertainment',
+];
+
+const difficulties = [
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
+];
+
+const timeLimits = [
+  { value: '5', label: '5 minutes' },
+  { value: '10', label: '10 minutes' },
+  { value: '15', label: '15 minutes' },
+  { value: '20', label: '20 minutes' },
+  { value: '30', label: '30 minutes' },
+  { value: 'unlimited', label: 'No time limit' },
+];
+
+type Inputs = {
+  title: string;
+  description: string;
+  tags?: string[];
+};
+
 const CreateQuiz = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const { register, handleSubmit, reset } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<CreateQuizFormType>({
-    title: '',
-    description: '',
-    category: '',
-    isPublic: true,
-    timeLimit: '10',
-    difficulty: 'medium',
+
+  const {
+    register,
+    control,
+    getValues,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    data,
+  } = useMutation({
+    mutationFn: createQuiz,
   });
 
-  const categories = [
-    'General Knowledge',
-    'Science',
-    'History',
-    'Sports',
-    'Technology',
-    'Arts & Literature',
-    'Geography',
-    'Entertainment',
-  ];
-
-  const difficulties = [
-    { value: 'easy', label: 'Easy' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'hard', label: 'Hard' },
-  ];
-
-  const timeLimits = [
-    { value: '5', label: '5 minutes' },
-    { value: '10', label: '10 minutes' },
-    { value: '15', label: '15 minutes' },
-    { value: '20', label: '20 minutes' },
-    { value: '30', label: '30 minutes' },
-    { value: 'unlimited', label: 'No time limit' },
-  ];
-
-  const handleInputChange = (field: keyof CreateQuizFormType, value: string | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const onSubmit: SubmitHandler<CreateQuizFormType> = function (data) {
+    console.log(data);
+    mutate(data);
   };
 
-  const mutation = useMutation({
-    mutationFn: (quizData: CreateQuizFormType) => createQuiz(quizData),
-    onSuccess: (data) => {
-      reset();
+  console.log(data);
 
-      // toast('Quiz created successfully');
-    },
-    onError: (error) => {
-      // toast('Error creating quiz');
-    },
-  });
-
-  const onSubmit = async (data: CreateQuizFormType) => {
-    alert('Hello');
-    mutation.mutate(data);
-
-    if (!data.title.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Quiz title is required',
-        variant: 'destructive',
-      });
-      return;
+  useEffect(() => {
+    if (isSuccess) {
+      const id = data.data.id;
+      toast.success(`Quiz ${data?.data?.title.toUpperCase()} successfully created`);
+      navigate(`/dashboard/quiz/${id}/add-question`);
     }
 
-    if (!data.category) {
-      toast({
-        title: 'Error',
-        description: 'Please select a category',
-        variant: 'destructive',
-      });
-      return;
+    if (isError) {
+      toast.error('Could not create quiz');
     }
-
-    setIsLoading(true);
-
-    // Mock API call with loading simulation
-    try {
-      console.log('Creating quiz with data:', data);
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Mock successful creation
-      const mockQuizId = 'quiz_' + Math.random().toString(36).substr(2, 9);
-
-      toast({
-        title: 'Success!',
-        description: 'Quiz created successfully',
-      });
-
-      console.log('Quiz created with ID:', mockQuizId);
-
-      reset();
-
-      // Navigate to add questions page
-      // navigate(`/dashboard/quiz/${mockQuizId}/add-question`);
-    } catch (error) {
-      console.error('Error creating quiz:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to create quiz. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isSuccess, isError, data?.data?.id, navigate, data?.data?.title]);
 
   return (
     <div className='p-6 max-w-4xl mx-auto'>
@@ -156,78 +116,62 @@ const CreateQuiz = () => {
                   Quiz Details
                 </CardTitle>
               </CardHeader>
+
               <CardContent className='space-y-4'>
+                {/* Title */}
                 <div className='space-y-2'>
                   <Label htmlFor='title'>Quiz Title *</Label>
                   <Input
                     id='title'
                     placeholder='Enter an engaging quiz title...'
-                    // value={formData.title}
-                    // onChange={(e) => handleInputChange('title', e.target.value)}
                     disabled={isLoading}
                     className='text-base'
+                    aria-invalid={!!errors.title}
+                    aria-describedby='title-error'
                     {...register('title', {
                       required: 'Quiz title is required',
-                      minLength: {
-                        value: 3,
-                        message: 'Title must be at least 3 characters long',
-                      },
                     })}
                   />
+                  {errors.title && (
+                    <p id='title-error' className='text-red-500 text-sm'>
+                      {errors.title.message as string}
+                    </p>
+                  )}
                 </div>
 
+                {/* Description */}
                 <div className='space-y-2'>
                   <Label htmlFor='description'>Description</Label>
                   <Textarea
                     id='description'
                     placeholder='Provide a brief description of your quiz...'
-                    // value={formData.description}
-                    // onChange={(e) => handleInputChange('description', e.target.value)}
                     disabled={isLoading}
                     rows={3}
                     className='resize-none'
+                    aria-invalid={!!errors.description}
+                    aria-describedby='description-error'
                     {...register('description', {
-                      required: 'Description is required',
-                      minLength: {
-                        value: 10,
-                        message: 'Description must be at least 10 characters long',
-                      },
+                      required: 'Quiz description is required',
                     })}
                   />
+                  {errors.description && (
+                    <p id='description-error' className='text-red-500 text-sm'>
+                      {errors.description.message as string}
+                    </p>
+                  )}
                 </div>
 
+                {/* Tags */}
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor='category'>Category *</Label>
-                    <Select
-                      // value={formData.category}
-                      // onValueChange={(value) => handleInputChange('category', value)}
-                      disabled={isLoading}
-                      {...register('category', {
-                        required: 'Category is required',
-                      })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select a category' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor='tags'>Tags</Label>
+                    <Taginput control={control} placeholder='science (click enter to add)' />
                   </div>
 
-                  <div className='space-y-2'>
+                  {/* TODO: Difficulty Select – re-enable if needed */}
+                  {/* <div className='space-y-2'>
                     <Label htmlFor='difficulty'>Difficulty</Label>
-                    <Select
-                      // value={formData.difficulty}
-                      // onValueChange={(value) => handleInputChange('difficulty', value)}
-                      disabled={isLoading}
-                      {...register('difficulty')}
-                    >
+                    <Select disabled={isLoading}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -239,60 +183,25 @@ const CreateQuiz = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Settings Sidebar */}
+          {/* Sidebar Settings */}
           <div className='space-y-6'>
-            <Card>
+            {/* TODO: Quiz Settings (Time limit, visibility) – re-enable if needed */}
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Quiz Settings</CardTitle>
               </CardHeader>
               <CardContent className='space-y-4'>
-                <div className='space-y-2'>
-                  <Label htmlFor='timeLimit'>Time Limit</Label>
-                  <Select
-                    // value={formData.timeLimit}
-                    // onValueChange={(value) => handleInputChange('timeLimit', value)}
-                    disabled={isLoading}
-                    {...register('timeLimit', {
-                      required: 'Time Limit is required',
-                    })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {timeLimits.map((limit) => (
-                        <SelectItem key={limit.value} value={limit.value}>
-                          {limit.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className='flex items-center justify-between space-x-2'>
-                  <div className='space-y-0.5'>
-                    <Label htmlFor='visibility'>Public Quiz</Label>
-                    <p className='text-xs text-muted-foreground'>
-                      Make this quiz discoverable by others
-                    </p>
-                  </div>
-                  <Switch
-                    id='visibility'
-                    checked={formData.isPublic}
-                    onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
-                    disabled={isLoading}
-                  />
-                </div>
+                ...
               </CardContent>
-            </Card>
+            </Card> */}
 
-            {/* Action Buttons */}
+            {/* Submit + Cancel */}
             <div className='space-y-3'>
               <Button type='submit' className='w-full' disabled={isLoading}>
                 {isLoading ? (
