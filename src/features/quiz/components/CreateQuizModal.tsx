@@ -57,7 +57,7 @@ const CreateQuizModal = ({ isOpen, onClose }: CreateQuizModalProps) => {
   };
 
   const mutation = useMutation({
-    mutationFn: (quizData: CreateQuizFormType) => createQuiz(quizData),
+    mutationFn: createQuiz,
     onSuccess: (data) => {
       reset();
       setTags([]);

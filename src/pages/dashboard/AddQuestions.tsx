@@ -8,29 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/common/components/ui
 import { Badge } from '@/common/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, ArrowLeft, CheckCircle } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { addQuestionToQuiz } from '@/features/quiz/api';
 
-interface QuestionFormData {
-  question: string;
-  option1: string;
-  option2: string;
-  option3: string;
-  option4: string;
-  option5: string;
-  correctAnswerIndex: number;
-}
-
-interface Question {
-  id: string;
-  question: string;
-  options: string[];
-  correctAnswerIndex: number;
-}
-
-interface Quiz {
-  id: string;
-  title: string;
-  questions: Question[];
-}
+import { QuestionFormData, Quiz } from '@/features/quiz/types';
 
 // Mock data
 const mockQuiz: Quiz = {
@@ -38,32 +19,31 @@ const mockQuiz: Quiz = {
   title: 'JavaScript Fundamentals',
   questions: [
     {
-      id: '1',
       question: 'What is the difference between let and var in JavaScript?',
       options: [
-        'Block scope vs function scope',
-        'No difference',
-        'let is older',
-        'var is deprecated',
+        { text: 'Block scope vs function scope', isCorrect: true },
+        { text: 'No difference', isCorrect: false },
+        { text: 'let is older', isCorrect: false },
+        { text: 'var is deprecated', isCorrect: false },
       ],
-      correctAnswerIndex: 0,
     },
     {
-      id: '2',
       question: 'Which method is used to add an element to the end of an array?',
-      options: ['push()', 'pop()', 'shift()', 'unshift()'],
-      correctAnswerIndex: 0,
+      options: [
+        { text: 'push()', isCorrect: true },
+        { text: 'pop()', isCorrect: false },
+        { text: 'shift()', isCorrect: false },
+        { text: 'unshift()', isCorrect: false },
+      ],
     },
     {
-      id: '3',
       question: 'What does the "this" keyword refer to in JavaScript?',
       options: [
-        'The current function',
-        'The global object',
-        'The current object context',
-        'The parent object',
+        { text: 'The current function', isCorrect: false },
+        { text: 'The global object', isCorrect: false },
+        { text: 'The current object context', isCorrect: true },
+        { text: 'The parent object', isCorrect: false },
       ],
-      correctAnswerIndex: 2,
     },
   ],
 };
@@ -73,8 +53,7 @@ const AddQuestion = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [optionCount, setOptionCount] = useState(4);
-  const [isLoading, setIsLoading] = useState(false);
-  const [questions, setQuestions] = useState<Question[]>(mockQuiz.questions);
+  const [questions, setQuestions] = useState<QuestionFormData[]>(mockQuiz.questions);
 
   const {
     register,
@@ -82,56 +61,76 @@ const AddQuestion = () => {
     reset,
     watch,
     formState: { errors },
-  } = useForm<QuestionFormData>({
-    defaultValues: {
-      correctAnswerIndex: 0,
-    },
+  } = useForm<QuestionFormData>();
+
+  const {
+    mutate,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    data,
+  } = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: QuestionFormData }) =>
+      addQuestionToQuiz(id, data),
   });
 
   const onSubmit = async (data: QuestionFormData) => {
-    // Mock validation
-    const filledOptions = [data.option1, data.option2, data.option3, data.option4, data.option5]
-      .filter((option) => option?.trim() !== '')
-      .slice(0, optionCount);
+    console.log(data);
 
-    if (filledOptions.length < 2) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please fill at least 2 options',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (data.correctAnswerIndex >= filledOptions.length) {
-      toast({
-        title: 'Validation Error',
-        description: 'Please select a valid correct answer',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Mock submission with loading state
-    setIsLoading(true);
-    console.log('Submitting question:', {
-      question: data.question,
-      options: filledOptions,
-      correctAnswerIndex: data.correctAnswerIndex,
-    });
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Mock success response
-    const newQuestion: Question = {
-      id: `mock-${Date.now()}`,
-      question: data.question,
-      options: filledOptions,
-      correctAnswerIndex: data.correctAnswerIndex,
+    {
+      text: data.text,
+      answers: [
+        { text: data?.option1, isCorrect: false },
+    { text: data.option2, isCorrect: false },
+    { text: data.option3, isCorrect: false },
+    { text: data.option4, isCorrect: false },
+      ]
     };
 
-    setQuestions((prev) => [...prev, newQuestion]);
+    // // Mock validation
+    // const filledOptions = [data.option1, data.option2, data.option3, data.option4, data.option5]
+    //   .filter((option) => option?.trim() !== '')
+    //   .slice(0, optionCount);
+
+    // if (filledOptions.length < 2) {
+    //   toast({
+    //     title: 'Validation Error',
+    //     description: 'Please fill at least 2 options',
+    //     variant: 'destructive',
+    //   });
+    //   return;
+    // }
+
+    // if (data.correctAnswerIndex >= filledOptions.length) {
+    //   toast({
+    //     title: 'Validation Error',
+    //     description: 'Please select a valid correct answer',
+    //     variant: 'destructive',
+    //   });
+    //   return;
+    // }
+
+    // // Mock submission with loading state
+    // console.log('Submitting question:', {
+    //   question: data.question,
+    //   options: filledOptions,
+    //   correctAnswerIndex: data.correctAnswerIndex,
+    // });
+
+    // // mutate({ id, data });
+
+    // // Simulate API delay
+    // await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    // // Mock success response
+    // const newQuestion: Question = {
+    //   id: `mock-${Date.now()}`,
+    //   question: data.question,
+    //   options: filledOptions,
+    //   correctAnswerIndex: data.correctAnswerIndex,
+    // };
+
+    // setQuestions((prev) => [...prev, newQuestion]);
 
     toast({
       title: 'Success',
@@ -139,7 +138,6 @@ const AddQuestion = () => {
     });
 
     reset();
-    setIsLoading(false);
   };
 
   const addOption = () => {
@@ -187,12 +185,12 @@ const AddQuestion = () => {
                   <Label htmlFor='question'>Question</Label>
                   <Input
                     id='question'
-                    {...register('question', { required: 'Question is required' })}
+                    {...register('text', { required: 'Question is required' })}
                     placeholder='Enter your question...'
                     className='mt-1'
                   />
-                  {errors.question && (
-                    <p className='text-sm text-destructive mt-1'>{errors.question.message}</p>
+                  {errors.text && (
+                    <p className='text-sm text-destructive mt-1'>{errors.text.message}</p>
                   )}
                 </div>
 
