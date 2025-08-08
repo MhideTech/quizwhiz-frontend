@@ -87,13 +87,13 @@ const CreateQuiz = () => {
     if (isSuccess) {
       const id = data.data.id;
       toast.success(`Quiz ${data?.data?.title.toUpperCase()} successfully created`);
-      navigate(`/dashboard/quiz/${id}/add-question`);
+      navigate(`/dashboard/quiz/${id}/add-question`, { state: data });
     }
 
     if (isError) {
       toast.error('Could not create quiz');
     }
-  }, [isSuccess, isError, data?.data?.id, navigate, data?.data?.title]);
+  }, [isSuccess, isError, data?.data?.id, navigate, data?.data?.title, data]);
 
   return (
     <div className='p-6 max-w-4xl mx-auto'>
