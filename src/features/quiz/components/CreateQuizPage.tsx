@@ -62,7 +62,6 @@ const CreateQuiz = () => {
   const {
     register,
     control,
-    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm();
