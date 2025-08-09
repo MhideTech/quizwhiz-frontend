@@ -52,6 +52,22 @@ const AddQuestion = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // initial quiz loading
+  const { id } = useParams<{ id: string }>();
+  const locationState = useLocation().state as { id?: string } | undefined;
+  const shouldFetch = !locationState || locationState.id !== id;
+  const {
+    data: fetchedQuizData,
+    isSuccess: fetchIsSuccess,
+    isPending: fetchPening,
+  } = useQuery({
+    queryKey: ['quiz', id],
+    queryFn: () => getQuiz(id),
+    enabled: shouldFetch,
+  });
+  const quizData = !shouldFetch ? locationState : fetchIsSuccess ? fetchedQuizData.data : null;
+
   const [optionCount, setOptionCount] = useState(4);
   const [questions, setQuestions] = useState<QuestionFormData[]>(mockQuiz.questions);
 
