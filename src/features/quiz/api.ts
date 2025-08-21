@@ -19,4 +19,5 @@ export async function addQuestionToQuiz(quizId: string, question: QuestionFormDa
 
 export async function getQuestions(quizId: string) {
   const { data } = await axiosInstance.get(`${quizRoute}/${quizId}/question`);
+  return data;
 }
