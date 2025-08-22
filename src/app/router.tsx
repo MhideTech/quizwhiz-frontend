@@ -14,7 +14,7 @@ import Dashboard from '@/pages/dashboard/Dashboard';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import AddQuestion from '@/pages/dashboard/AddQuestions';
 import Protect from '@/features/auth/Protect';
-import CreateQuiz from '@/features/quiz/components/CreateQuizPage';
+import CreateQuiz from '@/features/quiz/manage/components/CreateQuizPage';
 
 const router = createBrowserRouter([
   {

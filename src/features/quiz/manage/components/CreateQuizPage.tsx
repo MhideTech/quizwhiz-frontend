@@ -21,7 +21,7 @@ import { Plus, Save, Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { InputType } from 'zlib';
 import { useMutation } from '@tanstack/react-query';
-import { createQuiz } from '../api';
+import { createQuiz } from '../../api';
 import { CreateQuizFormType } from '../types';
 
 const categories = [

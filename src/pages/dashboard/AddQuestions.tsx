@@ -9,40 +9,32 @@ import { Badge } from '@/common/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addQuestionToQuiz, getQuestions, getQuiz } from '@/features/quiz/api';
+import { addQuestionToQuiz, getQuestions, getQuiz } from '@/features/quiz/manage/api';
 
-import { QuestionFormData, Quiz as QuizType } from '@/features/quiz/types';
-import AddQuestionsForm from '@/features/quiz/components/AddQuestionsForm';
-import PreviouslyAddedQuestions from '@/features/quiz/components/PreviouslyAddedQuestions';
+import { QuestionFormData, Quiz as QuizType } from '@/features/quiz/manage/types';
+import AddQuestionsForm from '@/features/quiz/manage/components/AddQuestionsForm';
+import PreviouslyAddedQuestions from '@/features/quiz/manage/components/PreviouslyAddedQuestions';
+import { useQuestions, useQuiz, useShouldFetch } from '@/features/quiz/manage/hooks';
 
 const AddQuestion = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  // initial quiz loading
-  const { id } = useParams<{ id: string }>();
-  const locationState = useLocation().state as { id?: string } | undefined;
-  const shouldFetch = !locationState || locationState.id !== id;
+  // todo better name for this
+  const { id, shouldFetch, locationState } = useShouldFetch();
   const {
-    data: fetchedQuizData,
+    quizData,
     isSuccess: fetchIsSuccess,
     isPending: fetchPending,
-  } = useQuery({
-    queryKey: ['quiz', id],
-    queryFn: () => getQuiz(id),
-    enabled: shouldFetch,
-  });
+  } = useQuiz({ quizId: id, enabled: shouldFetch, locationState });
 
   const {
-    data: questionsData,
+    questions,
     isSuccess: questionSuccess,
     isPending: questionPending,
-  } = useQuery({ queryKey: ['questions', id], queryFn: () => getQuestions(id) });
+  } = useQuestions({ quizId: id });
 
-  const questions = questionsData?.data;
   console.log(questions);
-  console.log(fetchedQuizData);
-  const quizData = !shouldFetch ? locationState : fetchIsSuccess ? fetchedQuizData.data : null;
+  console.log(quizData);
 
   return (
     <div className='container mx-auto p-6 max-w-4xl'>
