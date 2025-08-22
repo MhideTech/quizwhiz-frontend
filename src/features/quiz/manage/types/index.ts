@@ -9,14 +9,14 @@ export interface CreateQuizModalProps {
   onClose: () => void;
 }
 
+export interface Answer {
+  text: string;
+  isCorrect: boolean;
+}
+
 export interface QuestionFormData {
   text: string;
-  answers: [
-    { text: string; isCorrect: boolean },
-    { text: string; isCorrect: boolean },
-    { text: string; isCorrect: boolean },
-    { text: string; isCorrect: boolean },
-  ];
+  answers: Answer[]; // At least 2 answers, no upper limit
 }
 
 // export interface Question {

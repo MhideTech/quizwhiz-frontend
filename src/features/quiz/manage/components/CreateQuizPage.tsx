@@ -21,7 +21,7 @@ import { Plus, Save, Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { InputType } from 'zlib';
 import { useMutation } from '@tanstack/react-query';
-import { createQuiz } from '../api';
+import { createQuiz } from '@/features/quiz/manage/api.ts';
 import { CreateQuizFormType } from '../types';
 
 const categories = [
@@ -62,7 +62,6 @@ const CreateQuiz = () => {
   const {
     register,
     control,
-    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm();
@@ -82,19 +81,15 @@ const CreateQuiz = () => {
     mutate(data);
   };
 
-  console.log(data);
-
   useEffect(() => {
-    if (isSuccess) {
-      const id = data.data.id;
+    const id = data?.data?.id;
+    if (isSuccess && id) {
       toast.success(`Quiz ${data?.data?.title.toUpperCase()} successfully created`);
-      navigate(`/dashboard/quiz/${id}/add-question`);
-    }
-
-    if (isError) {
+      navigate(`/dashboard/quiz/${id}/add-question`, { state: data });
+    } else if (isError) {
       toast.error('Could not create quiz');
     }
-  }, [isSuccess, isError, data?.data?.id, navigate, data?.data?.title]);
+  }, [isSuccess, isError, data, navigate]);
 
   return (
     <div className='p-6 max-w-4xl mx-auto'>

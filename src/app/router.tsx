@@ -6,15 +6,15 @@ import Profile from '@/pages/Profile';
 import Quiz from '@/pages/Quiz';
 import QuizFeed from '@/pages/QuizFeed';
 import NotFound from '@/pages/NotFound';
-import Layout from '@/common/components/layout/Layout';
+import Layout from '@/components/layout/Layout';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import VerifyEmail from '@/pages/VerifyEmail';
 import AuthPage from '@/pages/AuthPage';
 import Dashboard from '@/pages/dashboard/Dashboard';
-import DashboardLayout from '@/common/components/layout/DashboardLayout';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 import AddQuestion from '@/pages/dashboard/AddQuestions';
 import Protect from '@/features/auth/Protect';
-import CreateQuiz from '@/features/quiz/components/CreateQuizPage';
+import CreateQuiz from '@/features/quiz/manage/components/CreateQuizPage';
 
 const router = createBrowserRouter([
   {

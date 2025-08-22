@@ -10,7 +10,7 @@ import {
 import { Badge } from '@/common/components/ui/badge';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
-import CreateQuizModal from '@/features/quiz/components/CreateQuizModal';
+import CreateQuizModal from '@/features/quiz/manage/components/CreateQuizModal';
 import { useAuth } from '@/features/auth/useAuth';
 
 // Mock quiz data
