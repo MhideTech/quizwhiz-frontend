@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addQuestionToQuiz } from '../../api';
+import { addQuestionToQuiz } from '@/features/quiz/manage/api.ts';
 import { useParams } from 'react-router-dom';
 import { QuestionFormData } from '../types';
 import { toast } from 'sonner';

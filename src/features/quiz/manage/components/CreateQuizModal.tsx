@@ -6,7 +6,7 @@ import { Input } from '@/common/components/ui/input';
 import { Textarea } from '@/common/components/ui/textarea';
 import { Label } from '@/common/components/ui/label';
 import { Badge } from '@/common/components/ui/badge';
-import { createQuiz } from '../../api';
+import { createQuiz } from '@/features/quiz/manage/api.ts';
 import { useMutation } from '@tanstack/react-query';
 
 import { CreateQuizModalProps, CreateQuizFormType } from '../types';

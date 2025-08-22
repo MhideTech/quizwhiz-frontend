@@ -9,7 +9,7 @@ import { Badge } from '@/common/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, ArrowLeft, CheckCircle } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addQuestionToQuiz, getQuestions, getQuiz } from '@/features/quiz/manage/api';
+import { addQuestionToQuiz, getQuestions, getQuiz } from '@/features/quiz/manage/api.ts';
 
 import { QuestionFormData, Quiz as QuizType } from '@/features/quiz/manage/types';
 import AddQuestionsForm from '@/features/quiz/manage/components/AddQuestionsForm';
