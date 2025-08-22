@@ -6,11 +6,11 @@ import AddQuestionsHeader from '@/features/quiz/manage/components/AddQuestionsHe
 const AddQuestion = () => {
   // todo find a better name for this
   const { id, shouldFetch, locationState } = useShouldFetch();
-  const {
-    quizData,
-    isSuccess: fetchIsSuccess,
-    isPending: fetchPending,
-  } = useQuiz({ quizId: id, enabled: shouldFetch, locationState });
+  const { quizData, isPending: fetchPending } = useQuiz({
+    quizId: id,
+    enabled: shouldFetch,
+    locationState,
+  });
 
   const {
     questions,
