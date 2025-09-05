@@ -40,7 +40,7 @@ const mainNavItems = [
 const quizNavItems = [
   {
     title: 'View All Quizzes',
-    url: '/dashboard/quizzes',
+    url: '/dashboard/quiz',
     icon: FileQuestion,
   },
   {

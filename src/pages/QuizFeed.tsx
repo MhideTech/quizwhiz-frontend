@@ -113,7 +113,7 @@ const QuizFeed = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [quizzes] = useState(mockQuizzes);
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, authPending } = useAuth();
 
   const isAuthenticated = Boolean(isLoggedIn && !!user);
 
@@ -138,7 +138,28 @@ const QuizFeed = () => {
         return 'bg-gray-100 text-gray-700';
     }
   };
-
+  if (authPending) {
+    return (
+      <>
+        <style>
+          {`
+            @keyframes loading-bar-animation {
+              0% { width: 0%; }
+              30% { width: 30%; }
+              60% { width: 50%; }
+              100% { width: 95%; }
+            }
+            .loading-bar-animated {
+              animation: loading-bar-animation 5s ease-out forwards;
+            }
+          `}
+        </style>
+        <div className='w-screen fixed top-0 left-0 bg-gray-200 h-1 dark:bg-gray-700 '>
+          <div className='bg-blue-600 h-1 loading-bar-animated'></div>
+        </div>
+      </>
+    );
+  }
   return (
     <div className='min-h-screen bg-gray-50 py-12'>
       <div className='container mx-auto px-4'>

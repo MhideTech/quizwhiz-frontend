@@ -11,6 +11,7 @@ import { useAuth } from '../useAuth';
 import { toast } from 'sonner';
 import { Loader } from 'lucide-react';
 import axiosInstance from '@/common/api/axiosInstance';
+import queryClient from '@/app/queryClient';
 
 const LoginForm = () => {
   const { register, reset, handleSubmit } = useForm();
@@ -22,11 +23,11 @@ const LoginForm = () => {
     onSuccess: (data: LoginResponse) => {
       const { accessToken, user } = data;
 
+      // todo abstract this login functionality away
       if (accessToken && user) {
         // Set global Authorization header
         axiosInstance.defaults.headers['Authorization'] = `Bearer ${accessToken}`;
-        setUser(user);
-
+        queryClient.invalidateQueries({ queryKey: ['session'] });
         toast.success('Logged in successfully!');
         navigate('/feed');
       }

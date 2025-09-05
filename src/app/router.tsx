@@ -15,6 +15,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import AddQuestion from '@/pages/dashboard/AddQuestions';
 import Protect from '@/features/auth/Protect';
 import CreateQuiz from '@/features/quiz/manage/components/CreateQuizPage';
+import QuizzesAll from '@/pages/dashboard/QuizzesAll';
 
 const router = createBrowserRouter([
   {
@@ -77,6 +78,7 @@ const router = createBrowserRouter([
         element: <CreateQuiz />,
       },
       { path: 'quiz/:id/add-question', element: <AddQuestion /> },
+      { path: 'quiz', element: <QuizzesAll /> },
     ],
   },
   {
