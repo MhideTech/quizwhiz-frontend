@@ -8,10 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/common/components/ui/dropdown-menu';
+import { Skeleton } from '@/common/components/ui/skeleton';
+
+// TODO fix flickering on here
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, isLoggedIn } = useAuth();
+  const { user, isLoggedIn, authPending } = useAuth();
 
   const isAuthenticated = Boolean(user && isLoggedIn);
 
@@ -58,9 +61,14 @@ const Navbar = () => {
         </div>
 
         {/* Right Auth Buttons or Avatar */}
+
         <div className='hidden md:flex items-center space-x-4'>
-          {isAuthenticated ? (
-            avatar
+          {isAuthenticated || authPending ? (
+            authPending ? (
+              <Skeleton className='w-10 h-10  bg-gray-200 text-gray-700 rounded-full ' />
+            ) : (
+              avatar
+            )
           ) : (
             <>
               <Link to='/auth/signup'>

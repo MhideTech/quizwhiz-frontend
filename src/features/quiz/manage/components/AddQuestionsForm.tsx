@@ -1,11 +1,15 @@
 /**
  * `AddQuestionsForm` is a React component that renders a form for adding new quiz questions.
  * It allows users to input a question, dynamically add or remove answer options (between 2 and 5),
- * and select the correct answer using a radio button. The form includes validation for required fields
+ * and select the correct answer using a checkbox. The form includes validation for required fields
  * and displays error messages for invalid inputs. The submit button is disabled while loading.
+ *
+ * @component
+ * @example
+ * return (
+ *   <AddQuestionsForm />
+ * )
  */
-
-// Add the is correct toggle
 
 import { Card, CardHeader, CardContent, CardTitle } from '@/common/components/ui/card';
 import { Label } from '@/common/components/ui/label';
