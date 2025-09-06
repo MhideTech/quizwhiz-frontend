@@ -1,4 +1,3 @@
-
 import axiosInstance from '@/common/api/axiosInstance';
 
 export const getQuizzes = async (searchTerm?: string) => {
