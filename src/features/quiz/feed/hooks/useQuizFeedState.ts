@@ -79,7 +79,8 @@ export const useQuizFeedState = () => {
 
   const handlePlay = (quizId: string) => {
     console.log('Play quiz:', quizId);
-    // Add navigation logic here
+    // Navigate to lobby page
+    window.location.href = '/lobby';
   };
 
   const handleLoadMore = () => {
