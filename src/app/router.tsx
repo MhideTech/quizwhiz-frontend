@@ -2,6 +2,7 @@ import Landing from '@/pages/Landing';
 import SignUpPage from '@/pages/SignUpPage';
 import Login from '@/pages/Login';
 import Lobby from '@/pages/Lobby';
+import SinglePlayerLobby from '@/pages/SinglePlayerLobby';
 import Profile from '@/pages/Profile';
 import Quiz from '@/pages/Quiz';
 import QuizFeed from '@/pages/QuizFeed';
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
 
       {
         path: 'lobby',
+        element: <SinglePlayerLobby />,
+      },
+      {
+        path: 'lobby/multiplayer',
         element: <Lobby />,
       },
       {
