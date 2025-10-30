@@ -1,18 +1,80 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
+
+interface QuizFeedState {
+  isCreateModalOpen: boolean;
+  searchQuery: string;
+  selectedCategory: string;
+  selectedDifficulty: string;
+  selectedSort: string;
+}
+
+type QuizFeedAction =
+  | { type: 'OPEN_CREATE_MODAL' }
+  | { type: 'CLOSE_CREATE_MODAL' }
+  | { type: 'SET_SEARCH_QUERY'; payload: string }
+  | { type: 'SET_SELECTED_CATEGORY'; payload: string }
+  | { type: 'SET_SELECTED_DIFFICULTY'; payload: string }
+  | { type: 'SET_SELECTED_SORT'; payload: string }
+  | { type: 'RESET_FILTERS' };
+
+const initialState: QuizFeedState = {
+  isCreateModalOpen: false,
+  searchQuery: '',
+  selectedCategory: 'all',
+  selectedDifficulty: 'all',
+  selectedSort: 'recent',
+};
+
+const quizFeedReducer = (state: QuizFeedState, action: QuizFeedAction): QuizFeedState => {
+  switch (action.type) {
+    case 'OPEN_CREATE_MODAL':
+      return { ...state, isCreateModalOpen: true };
+    case 'CLOSE_CREATE_MODAL':
+      return { ...state, isCreateModalOpen: false };
+    case 'SET_SEARCH_QUERY':
+      return { ...state, searchQuery: action.payload };
+    case 'SET_SELECTED_CATEGORY':
+      return { ...state, selectedCategory: action.payload };
+    case 'SET_SELECTED_DIFFICULTY':
+      return { ...state, selectedDifficulty: action.payload };
+    case 'SET_SELECTED_SORT':
+      return { ...state, selectedSort: action.payload };
+    case 'RESET_FILTERS':
+      return { ...initialState, isCreateModalOpen: state.isCreateModalOpen };
+    default:
+      return state;
+  }
+};
 
 export const useQuizFeedState = () => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
-  const [selectedSort, setSelectedSort] = useState('recent');
+  const [state, dispatch] = useReducer(quizFeedReducer, initialState);
 
   const handleCreateQuiz = () => {
-    setIsCreateModalOpen(true);
+    dispatch({ type: 'OPEN_CREATE_MODAL' });
   };
 
   const handleCloseModal = () => {
-    setIsCreateModalOpen(false);
+    dispatch({ type: 'CLOSE_CREATE_MODAL' });
+  };
+
+  const setSearchQuery = (query: string) => {
+    dispatch({ type: 'SET_SEARCH_QUERY', payload: query });
+  };
+
+  const setSelectedCategory = (category: string) => {
+    dispatch({ type: 'SET_SELECTED_CATEGORY', payload: category });
+  };
+
+  const setSelectedDifficulty = (difficulty: string) => {
+    dispatch({ type: 'SET_SELECTED_DIFFICULTY', payload: difficulty });
+  };
+
+  const setSelectedSort = (sort: string) => {
+    dispatch({ type: 'SET_SELECTED_SORT', payload: sort });
+  };
+
+  const resetFilters = () => {
+    dispatch({ type: 'RESET_FILTERS' });
   };
 
   const handlePlay = (quizId: string) => {
@@ -26,15 +88,12 @@ export const useQuizFeedState = () => {
   };
 
   return {
-    isCreateModalOpen,
-    searchQuery,
-    selectedCategory,
-    selectedDifficulty,
-    selectedSort,
+    ...state,
     setSearchQuery,
     setSelectedCategory,
     setSelectedDifficulty,
     setSelectedSort,
+    resetFilters,
     handleCreateQuiz,
     handleCloseModal,
     handlePlay,
