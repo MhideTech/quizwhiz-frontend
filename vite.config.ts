@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/v1': {
-        target: 'https://quizwhiz-backend-1.onrender.com',
+        // target: 'https://quizwhiz-backend-1.onrender.com',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: true,
       },
